@@ -61,3 +61,5 @@ typechain-types
 cache
 
 
+coverage.json
+typechain
