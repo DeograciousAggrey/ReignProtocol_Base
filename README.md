@@ -27,29 +27,29 @@ The contracts are deployed to Base Sepolia in the addresses listed below
 
 | Contract Name              | Contract Address                                                                                      |
 |----------------------------|-------------------------------------------------------------------------------------------------------|
-| Accounting.sol             | https://explorer.testnet.bitfinity.network/address/0xD38E56D7C26Dd34787DDC24A2ceE1bCA00dDf4F9         |
-| AuthorizeUser.sol          | https://explorer.testnet.bitfinity.network/address/0x3B299d9D1bD1b2E5e84e2Ae007d5F54e062B34D2         |
-| BaseUpgradeablePausable    | https://explorer.testnet.bitfinity.network/address/0x80C3C4e947C211E6509df1BC715788384435956B         |
-| Borrower                   | https://explorer.testnet.bitfinity.network/address/0xe8755C84C023248b5079791566d52097F09a25D7         |
-| CollateralToken            | https://explorer.testnet.bitfinity.network/address/0xfcaad95Dee676FF2f2D9bCcEa43485566795980e         |
-| ConfigHelper               | https://explorer.testnet.bitfinity.network/address/0xB90F4e594B04BbE9A1D4C2475FA5f2d65f7ffA4A         |
-| ConfigOptions              | https://explorer.testnet.bitfinity.network/address/0xECc3F6c8fb8FCA4FC2D0cFf44638Fdba6e17B08d         |
-| Constants                  | https://explorer.testnet.bitfinity.network/address/0x9671FBa5A22c780b280B673cBb9632dD0e111e05         |
-| DSMath                     | https://explorer.testnet.bitfinity.network/address/0x05Da0Cb2f80d5D729DA53D1965C2318670076473         |
-| IdentityToken              | https://explorer.testnet.bitfinity.network/address/0xc4bd6eC7dEfBa36bE09853597E72a405bD0dcC54         |
-| Investor                   | https://explorer.testnet.bitfinity.network/address/0xC999161aD9c7E7370CE3148fBc69842c3E8c713D         |
-| MultiSign                  | https://explorer.testnet.bitfinity.network/address/0x2Cf3FEa0FA0Fc8b4ff069CA1Dcf97a06Af2CF00F         |
-| OpportunityManager         | https://explorer.testnet.bitfinity.network/address/0x2C5553b691dea0d3E2FB6960B9d04c09aFdAF573         |
-| OpportunityPool            | https://explorer.testnet.bitfinity.network/address/0xC7E1Edf207D2993D56bccCfCd570E4A3Fe7F5C22         |
-| PauserPausable             | https://explorer.testnet.bitfinity.network/address/0x763FcAF6725A1484d8B80b8ADC520702416be09B         |
-| ReignCoin                  | https://explorer.testnet.bitfinity.network/address/0x9fcEDD72b864318b1482DCb25754a7658a63d7C5         |
-| ReignConfig                | https://explorer.testnet.bitfinity.network/address/0x206cb68DB038a79fD1026841f367749334DE9D3E         |
-| ReignKeeper                | https://explorer.testnet.bitfinity.network/address/0x8e8F9c6De5D2b2C1883ee4990B06E62cE04CD336         |
-| ReignTreasury              | https://explorer.testnet.bitfinity.network/address/0xA38f4CCDeF5c67315f35343a832be3179ba3348c         |
-| SeniorPool                 | https://explorer.testnet.bitfinity.network/address/0xE6c6722A9AE77dfD9A18AAA1A11ED509442a6A2F         |
-| ReignStaking               | https://explorer.testnet.bitfinity.network/address/0x0ee356e5C64e2c56645848b7aA5272E1A7d70941         |
-| TestUSDCToken              | https://explorer.testnet.bitfinity.network/address/0x769f3bC48ae94974b8b288b8ef6aDb0b174513f7         |
-| NFTMinter                  | https://explorer.testnet.bitfinity.network/address/0x90433F14c2484d5E8C2Bb1FDC8193f8B82334Cc5         |
+| Accounting.sol             | [0x93fE14e7A86f2A58478D46B9Ba45cC5b243ED26A](https://sepolia.basescan.org/address/0x93fE14e7A86f2A58478D46B9Ba45cC5b243ED26A)                       |
+| AuthorizeUser.sol          | [0x1B35208d33fD650Ce956ee66b10d19cA8d212Ac8](https://sepolia.basescan.org/address/0x1B35208d33fD650Ce956ee66b10d19cA8d212Ac8)                       |
+| BaseUpgradeablePausable    | [0xdE84D53cb9271A092Ed8C1AEC3a3Cc29aEEbCcd6](https://sepolia.basescan.org/address/0xdE84D53cb9271A092Ed8C1AEC3a3Cc29aEEbCcd6)                       |
+| Borrower                   | [0x13aEE927704043b16D08315057F7C737d032b998](https://sepolia.basescan.org/address/0x13aEE927704043b16D08315057F7C737d032b998)                       |
+| CollateralToken            | [0x543771273D4020a9A6A5715492De8e96E09D5fcf](https://sepolia.basescan.org/address/0x543771273D4020a9A6A5715492De8e96E09D5fcf)                       |
+| ConfigHelper               | [0x3Ad49C10E8DEb1a5160A17c41Ac0eEb1A3925EB3](https://sepolia.basescan.org/address/0x3Ad49C10E8DEb1a5160A17c41Ac0eEb1A3925EB3)                       |
+| ConfigOptions              | [0x494416916AfCb8D603015CaDDd2D38C3358b4D71](https://sepolia.basescan.org/address/0x494416916AfCb8D603015CaDDd2D38C3358b4D71)                       |
+| Constants                  | [0xB403Da1996dA4710A09c15BdeE2B8a37D7303D13](https://sepolia.basescan.org/address/0xB403Da1996dA4710A09c15BdeE2B8a37D7303D13)                       |
+| DSMath                     | [0x5Faf069aF113f1583bda262a4BD2FBedeaE07eb9](https://sepolia.basescan.org/address/0x5Faf069aF113f1583bda262a4BD2FBedeaE07eb9)                       |
+| IdentityToken              | [0x14Add4B2FAd3653Ff4dc07efd14d2158Bd1c428d](https://sepolia.basescan.org/address/0x14Add4B2FAd3653Ff4dc07efd14d2158Bd1c428d)                       |
+| Investor                   | [0xeC65732eB7ACfE0f31c25257c5F3d587c4e2422F](https://sepolia.basescan.org/address/0xeC65732eB7ACfE0f31c25257c5F3d587c4e2422F)                       |
+| MultiSign                  | [0xa6F80efCfBAdF2CEa78B4a6935d484dA95579617](https://sepolia.basescan.org/address/0xa6F80efCfBAdF2CEa78B4a6935d484dA95579617)                       |
+| OpportunityManager         | [0xc3e7751FE921E5D7EE05dB002103114821b8B555](https://sepolia.basescan.org/address/0xc3e7751FE921E5D7EE05dB002103114821b8B555)                       |
+| OpportunityPool            | [0x4469C2Bf795e686C7f17D7a86A7FB3CCB60B3fC3](https://sepolia.basescan.org/address/0x4469C2Bf795e686C7f17D7a86A7FB3CCB60B3fC3)                       |
+| PauserPausable             | [0xB5C3a76f5811223eC843e0048dFd0ca305069045](https://sepolia.basescan.org/address/0xB5C3a76f5811223eC843e0048dFd0ca305069045)                       |
+| ReignCoin                  | [0x12a260C1ad7E1f3914C6480f11075E20C9eFa6A9](https://sepolia.basescan.org/address/0x12a260C1ad7E1f3914C6480f11075E20C9eFa6A9)                       |
+| ReignConfig                | [0x9a39d9Eb3bdb8541f88CDdCcA0bec83316df7206](https://sepolia.basescan.org/address/0x9a39d9Eb3bdb8541f88CDdCcA0bec83316df7206)                       |
+| ReignKeeper                | [0x4b031E1eEab8f588e0c716721a8A39B822BB3db5](https://sepolia.basescan.org/address/0x4b031E1eEab8f588e0c716721a8A39B822BB3db5)                       |
+| ReignTreasury              | [0xe2CEC52c6f8DdAaa14120d2F5CbF390AA0eAB94C](https://sepolia.basescan.org/address/0xe2CEC52c6f8DdAaa14120d2F5CbF390AA0eAB94C)                       |
+| SeniorPool                 | [0x2339C7Ac9504A67b938F9D1f05805780161dD060](https://sepolia.basescan.org/address/0x2339C7Ac9504A67b938F9D1f05805780161dD060)                       |
+| ReignStaking               | [0x9929A5177faE837D338B84B4d8C07C437776d548](https://sepolia.basescan.org/address/0x9929A5177faE837D338B84B4d8C07C437776d548)                       |
+| TestUSDCToken              | [0xD730FdA416e58aaa78122b3E62822AC5c897242e](https://sepolia.basescan.org/address/0xD730FdA416e58aaa78122b3E62822AC5c897242e)                       |
+| NFTMinter                  | [0x3b0D1F43C4ee7F30C214D14F4AeE208b9110bbbc](https://sepolia.basescan.org/address/0x3b0D1F43C4ee7F30C214D14F4AeE208b9110bbbc)                       |
 
 
 
