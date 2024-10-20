@@ -252,68 +252,97 @@ export const getSeniorPoolDisplaySharePrice = async () => {
 
 export const getJuniorWithdrawableOp = async () => {
 	Sentry.captureMessage("getJuniorWithdrawableOp", "info");
+
+	// Fetch investor address
 	let { result } = await getEthAddress();
 	let investorAddress = result;
+	
 	try {
+		// Ensure Ethereum provider (MetaMask or similar) is available
 		if (typeof window.ethereum !== "undefined") {
 			const provider = new ethers.providers.Web3Provider(window.ethereum);
 			const signer = provider.getSigner();
+
+			// Log environment variables to check their values
+			console.log("Investor Contract Address:", process.env.REACT_APP_INVESTOR);
+			console.log("Opportunity Origination Address:", process.env.REACT_APP_OPPORTUNITY_ORIGINATION_ADDRESS);
+
+			// Ensure the environment variables are properly set
+			if (!process.env.REACT_APP_INVESTOR || !process.env.REACT_APP_OPPORTUNITY_ORIGINATION_ADDRESS) {
+				throw new Error("Missing or invalid contract addresses in environment variables");
+			}
+
+			// Investor contract initialization
 			const contract = new ethers.Contract(
 				process.env.REACT_APP_INVESTOR,
 				investor.abi,
 				provider
 			);
+
+			// Opportunity origination contract initialization
 			const originationContract = new ethers.Contract(
 				process.env.REACT_APP_OPPORTUNITY_ORIGINATION_ADDRESS,
 				opportunityOrigination.abi,
 				provider
 			);
 
-			let opportunities = await contract.getOpportunities(
-				investorAddress
-			);
+			// Fetch opportunities for the investor
+			let opportunities = await contract.getOpportunities(investorAddress);
 			let opportunityList = [];
+
+			// Iterate over opportunities
 			for (let i = 0; i < opportunities.length; i++) {
 				let tx = await originationContract.opportunityToId(opportunities[i]);
 				let { obj } = await getOpportunity(tx);
+
+				// Log pool address to debug invalid or undefined values
+				console.log("Opportunity Pool Address:", obj.opportunityPoolAddress);
+
+				// Skip if the opportunity pool address is the nullAddress
 				if (obj.opportunityPoolAddress === nullAddress) {
 					continue;
 				}
 
+				// Pool contract initialization (use signer for transactions, provider for read-only calls)
 				const poolContract = new ethers.Contract(
 					obj.opportunityPoolAddress,
 					opportunityPool.abi,
 					signer
 				);
+
+				// Fetch staking balance and other details
 				let stakingBal = await poolContract.stakingBalance(investorAddress);
-				stakingBal = ethers.utils.formatUnits(
-					stakingBal.toString(),
-					sixDecimals
-				);
+				stakingBal = ethers.utils.formatUnits(stakingBal.toString(), sixDecimals);
 				obj.capitalInvested = getDisplayAmount(stakingBal);
+
 				let poolBal = await poolContract.poolBalance();
 				poolBal = ethers.utils.formatUnits(poolBal, sixDecimals);
 
 				let estimatedAPY = await poolContract.juniorYieldPerecentage();
-
 				let apy = ethers.utils.formatUnits(estimatedAPY, sixDecimals);
 				obj.estimatedAPY = parseFloat(apy * 100).toFixed(2) + "%";
+
+				// Set yield generated if opportunity is in status 8
 				if (tx.opportunityStatus.toString() === "8") {
 					obj.yieldGenerated = getDisplayAmount(apy * stakingBal);
 				}
+
+				// Fetch investor withdrawable amount
 				let investorWithdrawable = await poolContract.getUserWithdrawableAmount();
-				investorWithdrawable = ethers.utils.formatUnits(
-					investorWithdrawable.toString(),
-					sixDecimals
-				);
-				obj.withdrawableAmt =
-					parseInt(poolBal) >= parseInt(obj.opportunityAmount)
-						? investorWithdrawable
-						: 0;
+				investorWithdrawable = ethers.utils.formatUnits(investorWithdrawable.toString(), sixDecimals);
+				obj.withdrawableAmt = parseInt(poolBal) >= parseInt(obj.opportunityAmount)
+					? investorWithdrawable
+					: 0;
+
+				// Add opportunity object to list
 				opportunityList.push(obj);
 			}
+
+			// Return opportunity list and success status
 			return { opportunityList, success: true };
+
 		} else {
+			// Handle case where wallet connection is not available
 			Sentry.captureMessage("Wallet connect error", "warning");
 			return {
 				success: false,
@@ -321,13 +350,16 @@ export const getJuniorWithdrawableOp = async () => {
 			};
 		}
 	} catch (error) {
+		// Log the error to Sentry and return failure
 		Sentry.captureException(error);
+		console.error("Error in getJuniorWithdrawableOp:", error.message);
 		return {
 			success: false,
 			msg: error.message,
 		};
 	}
 };
+
 
 export const getUserSeniorPoolInvestment = async () => {
 	Sentry.captureMessage("getUserSeniorPoolInvestment", "info");
@@ -438,27 +470,34 @@ export const investInJuniorPool = async (poolAddress, amount) => {
 };
 
 export const getSeniorPoolData = async () => {
-	Sentry.captureMessage("getOpportunityJson", "info");
-	try {
-		let file = await retrieveFiles(process.env.REACT_APP_SENIORPOOL_CID);
-		let dataReader = await retrieveFileFromURL(
-			getIPFSFileURL(process.env.REACT_APP_SENIORPOOL_CID) +
-				"/seniorPoolData.json"
-		);
-		if (!dataReader) {
-			dataReader = await retrieveFileFromURL(
-				getIPFSFileURLOption2(process.env.REACT_APP_SENIORPOOL_CID) +
-					"/seniorPoolData.json"
-			);
-		}
-		if (!dataReader) {
-			dataReader = await retrieveFileFromURL(
-				getIPFSFileURLOption3(process.env.REACT_APP_SENIORPOOL_CID) +
-					"/seniorPoolData.json"
-			);
-		}
-		return dataReader;
-	} catch (error) {
-		Sentry.captureException(error);
-	}
+    Sentry.captureMessage("getOpportunityJson", "info");
+    try {
+        // Attempt to use the provided CID from environment variables.
+        let file = await retrieveFiles(process.env.REACT_APP_SENIORPOOL_CID);
+        
+        // Construct the URL to access the JSON file via Infura
+        const infuraURL = `https://ipfs.infura.io/ipfs/${process.env.REACT_APP_SENIORPOOL_CID}/seniorPoolData.json`;
+
+        // Attempt to fetch from Infura
+        let dataReader = await retrieveFileFromURL(infuraURL);
+
+        // Fallback methods if the Infura fetch fails
+        if (!dataReader) {
+            dataReader = await retrieveFileFromURL(
+                getIPFSFileURLOption2(process.env.REACT_APP_SENIORPOOL_CID) +
+                "/seniorPoolData.json"
+            );
+        }
+        if (!dataReader) {
+            dataReader = await retrieveFileFromURL(
+                getIPFSFileURLOption3(process.env.REACT_APP_SENIORPOOL_CID) +
+                "/seniorPoolData.json"
+            );
+        }
+
+        return dataReader; // Return the fetched data
+    } catch (error) {
+        Sentry.captureException(error);
+        return null; // Ensure to return null or handle error appropriately
+    }
 };

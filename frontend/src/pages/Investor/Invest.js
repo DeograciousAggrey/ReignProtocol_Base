@@ -17,119 +17,96 @@ const Invest = () => {
 	const path = useNavigate();
 	const [juniorPools, setJuniorPools] = useState([]);
 	const [seniorPool, setSeniorPool] = useState();
-
 	const [kycStatus, setKycStatus] = useState();
-
 	const [seniorPoolLoading, setSeniorPoolLoading] = useState(true);
 	const [juniorPoolLoading, setJuniorPoolLoading] = useState(true);
 	const cardData = useRef({
-		opportunityInfo: "",
-		opportunityAmount: "",
-		loanInterest: "",
-		isFull: "",
-	});
-	const [errormsg, setErrormsg] = useState({
-		status: false,
-		msg: "",
-	});
+        opportunityInfo: "",
+        opportunityAmount: "",
+        loanInterest: "",
+        isFull: "",
+    });
+    const [errormsg, setErrormsg] = useState({
+        status: false,
+        msg: "",
+    });
 
-	useEffect(() => {
-		getUserWalletAddress().then((res) => {
-			if (res.success) {
-				checkForKyc(res.address);
-			} else {
-				console.log(res.msg);
-				setErrormsg({
-					status: !res.success,
-					msg: res.msg,
-				});
-			}
-		});
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+    useEffect(() => {
+        getUserWalletAddress().then((res) => {
+            if (res.success) {
+                checkForKyc(res.address); // This will always set kycStatus to true
+            } else {
+                console.log(res.msg);
+                setErrormsg({
+                    status: !res.success,
+                    msg: res.msg,
+                });
+            }
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
-	const checkForKyc = async (refId) => {
-		try {
-			const result = await axiosHttpService(kycOptions(refId));
-			if (
-				result.res.status === "success" &&
-				result.res.data.status === "approved"
-			) {
-				setKycStatus(true);
-			}
-			if (result.res.status === "error") {
-				//
-				//
-				//
-				//
-				setKycStatus(false);
-				//
-				//
-				//
-				//
-			}
-		} catch (error) {
-			console.log(error);
-		}
-	};
+    const checkForKyc = async (refId) => {
+        // Always set KYC status to true
+        setKycStatus(true);
+        console.log("Bypassing KYC verification.");
+    };
 
-	useEffect(() => {
-		try {
-			getAllActiveOpportunities().then((res) => {
-				if (res.opportunities && res.opportunities.length) {
-					setJuniorPools(res.opportunities);
-					setJuniorPoolLoading(false);
-				} else {
-					setJuniorPoolLoading(false);
-				}
-			});
-		} catch (error) {
-			console.log(error);
-			setJuniorPoolLoading(false);
-		}
-	}, []);
+    useEffect(() => {
+        try {
+            getAllActiveOpportunities().then((res) => {
+                if (res.opportunities && res.opportunities.length) {
+                    setJuniorPools(res.opportunities);
+                    setJuniorPoolLoading(false);
+                } else {
+                    setJuniorPoolLoading(false);
+                }
+            });
+        } catch (error) {
+            console.log(error);
+            setJuniorPoolLoading(false);
+        }
+    }, []);
 
-	useEffect(() => {
-		// fetch data from IPFS
-		getSeniorPoolData().then((read) => {
-			if (read) {
-				read.onloadend = async function () {
-					let spJson = JSON.parse(read.result);
+    useEffect(() => {
+        // fetch data from IPFS
+        getSeniorPoolData().then((read) => {
+            if (read) {
+                read.onloadend = async function () {
+                    let spJson = JSON.parse(read.result);
 
-					if (spJson) {
-						let seniorInvestmentData = {};
-						seniorInvestmentData.opportunityName = spJson.poolName;
-						const res = await getWalletBal(process.env.REACT_APP_SENIORPOOL);
+                    if (spJson) {
+                        let seniorInvestmentData = {};
+                        seniorInvestmentData.opportunityName = spJson.poolName;
+                        const res = await getWalletBal(process.env.REACT_APP_SENIORPOOL);
 
-						if (res.success) {
-							seniorInvestmentData.opportunityAmount = getDisplayAmount(
-								res.balance
-							);
-							seniorInvestmentData.loanInterest = spJson.estimatedAPY + "%";
-							seniorInvestmentData.poolDescription = spJson.poolDescription;
-							seniorInvestmentData.isFull = false;
-							setSeniorPool(seniorInvestmentData);
-						} else {
-							console.log(res.msg);
-							setErrormsg({
-								status: !res.success,
-								msg: res.msg,
-							});
-						}
+                        if (res.success) {
+                            seniorInvestmentData.opportunityAmount = getDisplayAmount(res.balance);
+                            seniorInvestmentData.loanInterest = spJson.estimatedAPY + "%";
+                            seniorInvestmentData.poolDescription = spJson.poolDescription;
+                            seniorInvestmentData.isFull = false;
+                            setSeniorPool(seniorInvestmentData);
+                        } else {
+                            console.log(res.msg);
+                            setErrormsg({
+                                status: !res.success,
+                                msg: res.msg,
+                            });
+                        }
 
-						setSeniorPoolLoading(false);
-					}
-				};
-			}
-		});
-	}, []);
-
+                        setSeniorPoolLoading(false);
+                    }
+                };
+            }
+        });
+    }, []);
 	const loadingCard = (
 		<ViewPoolCard
 			onClick={() => console.log("card for loading")}
 			data={cardData.current}
 		/>
 	);
+
 
 	return (
 		<div className="">

@@ -24,10 +24,7 @@ const InvestorOverview = () => {
 	const [loading, setLoading] = useState(true);
 	const [seniorPoolLoading, setSeniorPoolLoading] = useState(true);
 	const [juniorPoolLoading, setJuniorPoolLoading] = useState(true);
-	const [errormsg, setErrormsg] = useState({
-		status: false,
-		msg: "",
-	});
+	const [errormsg, setErrormsg] = useState({ status: false, msg: "" });
 
 	const path = useNavigate();
 
@@ -42,26 +39,12 @@ const InvestorOverview = () => {
 
 		setSeniorPoolLoading(false);
 	}
-	// useEffect(() => {
-	// 	getUserSeniorPoolInvestment()
-	// 		.then((data) => {
-	// 			if (data.success) {
-	// 				setSeniorPoolInvestment(data.data);
-	// 			}
-	// 		})
-	// 		.catch((error) => console.log("Failed to get liquidity pool investment"))
-	// 		.finally(() => setSeniorPoolLoading(false));
-	// }, []);
 
 	useEffect(() => {
 		if (seniorPoolInvestment) {
-			let totalSPInvestment =
-				seniorPoolInvestment.stakingAmt + seniorPoolInvestment.withdrawableAmt;
-			if (totalSPInvestment.toFixed(2) <= 0.0) {
-				return;
-			}
+			let totalSPInvestment = seniorPoolInvestment.stakingAmt + seniorPoolInvestment.withdrawableAmt;
+			if (totalSPInvestment <= 0.0) return;
 
-			// fetch data from IPFS
 			getSeniorPoolData().then((read) => {
 				if (read) {
 					read.onloadend = async function () {
@@ -70,72 +53,64 @@ const InvestorOverview = () => {
 							if (spJson) {
 								let seniorInvestmentData = {};
 								seniorInvestmentData.opportunityName = spJson.poolName;
-								const res = await getWalletBal(
-									process.env.REACT_APP_SENIORPOOL
-								);
+								const res = await getWalletBal(process.env.REACT_APP_SENIORPOOL);
 
 								if (res.success) {
-									seniorInvestmentData.opportunityAmount = getDisplayAmount(
-										res.balance
-									);
+									seniorInvestmentData.opportunityAmount = getDisplayAmount(res.balance);
+									seniorInvestmentData.capitalInvested = getDisplayAmount(totalSPInvestment);
 
-									seniorInvestmentData.capitalInvested = getDisplayAmount(
-										totalSPInvestment
-									);
-
-									const price = await getSeniorPoolDisplaySharePrice(
-										spJson.estimatedAPY
-									);
+									const price = await getSeniorPoolDisplaySharePrice(spJson.estimatedAPY);
 
 									if (price.success) {
 										const { displaySharePrice, sharePriceFromContract } = price;
 										seniorInvestmentData.estimatedAPY = displaySharePrice;
-										seniorInvestmentData.yieldGenerated = getDisplayAmount(
-											parseFloat(
-												(totalSPInvestment * sharePriceFromContract) / 100
-											)
-										);
-
+										seniorInvestmentData.yieldGenerated = getDisplayAmount((totalSPInvestment * sharePriceFromContract) / 100);
 										setSeniorPool(seniorInvestmentData);
 									} else {
 										setSeniorPool(null);
-										setErrormsg({
-											status: !price.status,
-											msg: price.msg,
-										});
+										setErrormsg({ status: true, msg: price.msg });
 									}
 								} else {
-									setErrormsg({
-										status: !res.success,
-										msg: res.msg,
-									});
+									setErrormsg({ status: true, msg: res.msg });
 								}
 							}
 						} catch (error) {
-							console.log(error);
+							console.error("Error parsing senior pool data:", error);
 						}
 					};
 				}
 			});
 		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [seniorPoolInvestment]);
 
 	useEffect(() => {
 		async function fetch() {
-			await updateSummery();
-			const juniorPools = await getJuniorWithdrawableOp();
-			if (juniorPools.success) {
-				setJuniorPool(juniorPools.opportunityList);
-			} else {
-				console.log(juniorPools.msg);
-				setErrormsg({
-					status: !juniorPools.status,
-					msg: juniorPools.msg,
-				});
-			}
+			try {
+				await updateSummery();
+				const juniorPools = await getJuniorWithdrawableOp();
+				console.log('Fetched Junior Pools:', juniorPools);
 
-			setJuniorPoolLoading(false);
+				if (!juniorPools.success) {
+					throw new Error(juniorPools.msg);
+				}
+
+				if (!juniorPools.opportunityList || juniorPools.opportunityList.length === 0) {
+					throw new Error("No opportunities found.");
+				}
+
+				// Check the first opportunity for valid contract address
+				const firstPool = juniorPools.opportunityList[0];
+				if (!firstPool.contractAddress || !firstPool.contractAddress.startsWith("0x")) {
+					throw new Error("Invalid contract address for the first opportunity.");
+				}
+
+				setJuniorPool(juniorPools.opportunityList);
+			} catch (error) {
+				console.error("Error in fetch:", error.message);
+				setErrormsg({ status: true, msg: error.message });
+			} finally {
+				setJuniorPoolLoading(false);
+			}
 		}
 		fetch();
 	}, []);
@@ -143,7 +118,6 @@ const InvestorOverview = () => {
 	useEffect(() => {
 		if (!juniorPoolLoading && !seniorPoolLoading) setLoading(false);
 	}, [juniorPoolLoading, seniorPoolLoading]);
-
 	return (
 		<div className="lg:relative">
 			{loading && <Loader />}
