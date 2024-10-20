@@ -33,7 +33,7 @@ const Overview = () => {
 	const [nextDueAmount, setNextDueAmount] = useState();
 	const [selected, setSelected] = useState(null);
 	const [kycSelected, setKycSelected] = useState();
-	const [kycStatus, setKycStatus] = useState();
+	const [kycStatus, setKycStatus] = useState(true); // Bypass KYC by default
 	const [profileStatus, setProfileStatus] = useState();
 	const [borrowReqProcess, setBorrowReqProcess] = useState(false);
 	const [processModal, setProcessModal] = useState(false);
@@ -67,8 +67,8 @@ const Overview = () => {
 
 	const cutProcessModal = () => {
 		setSelected(null);
-		setProcessModal(null);
-		setOpenProcessDrawdown(null);
+		setProcessModal(false);
+		setOpenProcessDrawdown(false);
 	};
 
 	useEffect(() => {
@@ -83,10 +83,13 @@ const Overview = () => {
 				});
 			}
 		};
+
 		fetchData();
 		getUserWalletAddress().then((res) => {
 			if (res.success) {
-				checkForKycAndProfile(res.address);
+				// Directly set KYC and profile status without checking
+				setKycStatus(true); // Bypassing KYC check
+				checkForProfile(res.address);
 			} else {
 				console.log(res.msg);
 				setErrormsg({
@@ -97,53 +100,27 @@ const Overview = () => {
 		});
 	}, [loadDrawdownList, updateRepayment]);
 
-	function sortByProperty(property) {
-		return function (a, b) {
-			if (a[property] < b[property]) return -1;
-			else if (a[property] > b[property]) return 1;
-
-			return 0;
-		};
-	}
-
-	const checkForKycAndProfile = async (refId) => {
-		try {
-			const result = await axiosHttpService(kycOptions(refId));
-			if (
-				result.res.status === "success" &&
-				result.res.data.status === "approved"
-			) {
-				setKycStatus(true);
-			}
-			if (result.res.status === "error") {
-				setKycStatus(false);
-			}
-
-			getBorrowerDetails().then((res) => {
-				if (res.borrowerCid) {
-					setProfileStatus(true);
-				} else {
-					setProfileStatus(false);
-				}
-
-				setLoading(false);
-			});
-		} catch (error) {
-			console.log(error);
+	const checkForProfile = async (refId) => {
+		const res = await getBorrowerDetails();
+		if (res.borrowerCid) {
+			setProfileStatus(true);
+		} else {
+			setProfileStatus(false);
 		}
+		setLoading(false);
 	};
 
-	// get all upcoming reapayments
+	// Get all upcoming repayments
 	useEffect(() => {
 		const fetchData = async () => {
 			let opportunities = await getOpportunitiesWithDues();
 			if (opportunities.success) {
 				if (opportunities.opportunities.length >= 0) {
-					//sort the list based on date
+					// Sort the list based on date
 					opportunities.opportunities.sort(sortByProperty("epochDueDate"));
 					setRepaymentList(opportunities.opportunities);
 
-					// set next due date and amount
+					// Set next due date and amount
 					setNextDueAmount(
 						getDisplayAmount(opportunities.opportunities[0]?.repaymentAmount)
 					);
@@ -164,7 +141,7 @@ const Overview = () => {
 	}, [loadRepaymentList, updateRepayment]);
 
 	useEffect(() => {
-		// set total borrowed amount
+		// Set total borrowed amount
 		let totalLoanAmt = 0;
 		let totalLoanWithIntAmount = 0;
 		let totalRepaidAmt = 0;
@@ -183,15 +160,14 @@ const Overview = () => {
 			amount: totalRepaidAmt,
 			displayTotalRepaidAmt: getDisplayAmount(totalRepaidAmt),
 		});
-		totalLoanWithIntAmount = totalLoanWithIntAmount
-			? totalLoanWithIntAmount
-			: 0;
+		totalLoanWithIntAmount = totalLoanWithIntAmount ? totalLoanWithIntAmount : 0;
 
 		setTotalLoanAmtWithInterest(totalLoanWithIntAmount);
 		setTotalOutstandingAmt(
 			getDisplayAmount(totalLoanWithIntAmount - totalRepaidAmt)
 		);
 	}, [repaymentList]);
+
 
 	return (
 		<>
